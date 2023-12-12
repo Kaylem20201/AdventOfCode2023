@@ -10,7 +10,7 @@ var LimitOf;
 const redExp = new RegExp(/(?<cubes>\d+) red/);
 const greenExp = new RegExp(/(?<cubes>\d+) green/);
 const blueExp = new RegExp(/(?<cubes>\d+) blue/);
-function checkSet(setString) {
+function checkSetAgainstLimits(setString) {
     const redMatch = setString.match(redExp);
     const greenMatch = setString.match(greenExp);
     const blueMatch = setString.match(blueExp);
@@ -22,17 +22,56 @@ function checkSet(setString) {
         (greenCubes <= LimitOf.Green) &&
         (blueCubes <= LimitOf.Blue));
 }
-for (let i = 0; i < lines.length; i++) {
-    const id = i + 1;
-    const sets = lines[i].split(';');
-    let gameFlag = true;
-    for (const set of sets) {
-        gameFlag = checkSet(set);
-        if (!gameFlag)
-            break;
+function minimumCubesNeeded(gameString) {
+    let minimumRed = 0;
+    let minimumGreen = 0;
+    let minimumBlue = 0;
+    const sets = gameString.split(';');
+    for (const setString of sets) {
+        const redMatch = setString.match(redExp);
+        const greenMatch = setString.match(greenExp);
+        const blueMatch = setString.match(blueExp);
+        //Parse to int with null handling
+        const redCubes = (redMatch !== null && (redMatch.groups !== undefined)) ? Number.parseInt(redMatch?.groups['cubes']) : 0;
+        const greenCubes = (greenMatch !== null && (greenMatch.groups !== undefined)) ? Number.parseInt(greenMatch?.groups['cubes']) : 0;
+        const blueCubes = (blueMatch !== null && (blueMatch.groups !== undefined)) ? Number.parseInt(blueMatch?.groups['cubes']) : 0;
+        minimumRed = (redCubes > minimumRed) ? redCubes : minimumRed;
+        minimumGreen = (greenCubes > minimumGreen) ? greenCubes : minimumGreen;
+        minimumBlue = (blueCubes > minimumBlue) ? blueCubes : minimumBlue;
     }
-    //console.log('Game %d: ', id, gameFlag);
-    if (gameFlag)
-        sumOfIDs = sumOfIDs + id;
+    //console.log('minRed: %d, minGreen: %d, minBlue: %d', minimumRed, minimumGreen, minimumBlue);
+    return {
+        'Red': minimumRed,
+        'Green': minimumGreen,
+        'Blue': minimumBlue
+    };
 }
-console.log(sumOfIDs);
+function part1Main() {
+    for (let i = 0; i < lines.length; i++) {
+        const id = i + 1;
+        const sets = lines[i].split(';');
+        let gameFlag = true;
+        for (const set of sets) {
+            gameFlag = checkSetAgainstLimits(set);
+            if (!gameFlag)
+                break;
+        }
+        //console.log('Game %d: ', id, gameFlag);
+        if (gameFlag)
+            sumOfIDs = sumOfIDs + id;
+    }
+    console.log(sumOfIDs);
+}
+function part2Main() {
+    let sumOfPowerOfCubes = 0;
+    for (let i = 0; i < lines.length; i++) {
+        //const id = i + 1;
+        const minCubes = minimumCubesNeeded(lines[i]);
+        const powerOfCubes = minCubes['Red'] * minCubes['Green'] * minCubes['Blue'];
+        //console.log(powerOfCubes);
+        sumOfPowerOfCubes += powerOfCubes;
+    }
+    console.log(sumOfPowerOfCubes);
+}
+part2Main();
+process.exit();
