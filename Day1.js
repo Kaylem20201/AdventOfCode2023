@@ -1,17 +1,4 @@
-import fs from 'node:fs';
-import readline from 'node:readline';
-async function processLineByLine() {
-    const fileStream = fs.createReadStream('inputs/day1.txt');
-    const rl = readline.createInterface({
-        input: fileStream,
-        crlfDelay: Infinity,
-    });
-    const lines = [];
-    for await (const line of rl) {
-        lines.push(line);
-    }
-    return lines;
-}
+import { inputToLines } from './util.js';
 const DigitMatch = new RegExp("(one)|(two)|(three)|(four)|(five)|(six)|(seven)|(eight)|(nine)");
 function convertDigitStringToNumber(input) {
     switch (input) {
@@ -71,7 +58,7 @@ function findLastDigit(line) {
     return 0;
 }
 let sum = 0;
-const lines = await processLineByLine();
+const lines = await inputToLines(1);
 for (const line of lines) {
     const firstDigit = findFirstDigit(line);
     const lastDigit = findLastDigit(line);
