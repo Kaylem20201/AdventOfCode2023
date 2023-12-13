@@ -15,6 +15,31 @@ function part1Main() {
     console.log(scores.reduce( (accumulator,currentValue) => accumulator += currentValue));
 }
 
+function part2Main() {
+    const cards = lines.map( (lineString) => parseCard(lineString));
+    const copiesOfCards = new Map<number,number>();
+    for (const card of cards) { copiesOfCards.set(card.id,1);}
+    for (let i = 0; i < cards.length; i++) {
+        const cardId = cards[i].id;
+        const copiesOfCard = copiesOfCards.get(i);
+        const winningNumbers = getCardTotalWinningNumbers(cards[i]);
+        for (let j = 1; j <= winningNumbers; j++) {
+            const currentCopies = copiesOfCards.get(cardId);
+            const targetCopies = copiesOfCards.get(cardId+j);
+            if ((currentCopies === undefined) || (targetCopies === undefined)) process.exit(1);
+            copiesOfCards.set(cardId+j, targetCopies+(currentCopies));
+        }
+    }
+
+    let total = 0;
+    for (const copies of copiesOfCards.values()) {
+        //console.log(copies);
+        total += copies;
+    }
+
+    console.log(total);
+}
+
 function parseCard(cardLine : string) : CardInfo {
     const CARDEXP = /Card\s*(\d+)/;
     const WINNERSEXP = /:(?:\s*((?:\s*\d+\s*)+)\s*)+\|/;
@@ -45,7 +70,7 @@ function parseCard(cardLine : string) : CardInfo {
 
 }
 
-function getCardScore(cardInfo : CardInfo) : number {
+function getCardTotalWinningNumbers(cardInfo : CardInfo) : number {
     let matchingNumbers = 0;
     const winningNumbers = cardInfo.winningNumbers;
     const givenNumbers = cardInfo.givenNumbers;
@@ -54,6 +79,12 @@ function getCardScore(cardInfo : CardInfo) : number {
         if (givenNumbers.includes(winningNumber)) {matchingNumbers += 1;}
     }
 
+    return matchingNumbers;
+}
+
+function getCardScore(cardInfo : CardInfo) : number {
+    const matchingNumbers = getCardTotalWinningNumbers(cardInfo);
+
     const score = (matchingNumbers === 0) ? 0 :
         2 ** (matchingNumbers-1);
 
@@ -61,5 +92,6 @@ function getCardScore(cardInfo : CardInfo) : number {
 
 }
 
-part1Main();
+//part1Main();
+part2Main();
 process.exit();

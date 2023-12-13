@@ -6,6 +6,31 @@ function part1Main() {
     const scores = cards.map((card) => getCardScore(card));
     console.log(scores.reduce((accumulator, currentValue) => accumulator += currentValue));
 }
+function part2Main() {
+    const cards = lines.map((lineString) => parseCard(lineString));
+    const copiesOfCards = new Map();
+    for (const card of cards) {
+        copiesOfCards.set(card.id, 1);
+    }
+    for (let i = 0; i < cards.length; i++) {
+        const cardId = cards[i].id;
+        const copiesOfCard = copiesOfCards.get(i);
+        const winningNumbers = getCardTotalWinningNumbers(cards[i]);
+        for (let j = 1; j <= winningNumbers; j++) {
+            const currentCopies = copiesOfCards.get(cardId);
+            const targetCopies = copiesOfCards.get(cardId + j);
+            if ((currentCopies === undefined) || (targetCopies === undefined))
+                process.exit(1);
+            copiesOfCards.set(cardId + j, targetCopies + (currentCopies));
+        }
+    }
+    let total = 0;
+    for (const copies of copiesOfCards.values()) {
+        //console.log(copies);
+        total += copies;
+    }
+    console.log(total);
+}
 function parseCard(cardLine) {
     const CARDEXP = /Card\s*(\d+)/;
     const WINNERSEXP = /:(?:\s*((?:\s*\d+\s*)+)\s*)+\|/;
@@ -32,7 +57,7 @@ function parseCard(cardLine) {
     };
     return card;
 }
-function getCardScore(cardInfo) {
+function getCardTotalWinningNumbers(cardInfo) {
     let matchingNumbers = 0;
     const winningNumbers = cardInfo.winningNumbers;
     const givenNumbers = cardInfo.givenNumbers;
@@ -41,9 +66,14 @@ function getCardScore(cardInfo) {
             matchingNumbers += 1;
         }
     }
+    return matchingNumbers;
+}
+function getCardScore(cardInfo) {
+    const matchingNumbers = getCardTotalWinningNumbers(cardInfo);
     const score = (matchingNumbers === 0) ? 0 :
         2 ** (matchingNumbers - 1);
     return score;
 }
-part1Main();
+//part1Main();
+part2Main();
 process.exit();
