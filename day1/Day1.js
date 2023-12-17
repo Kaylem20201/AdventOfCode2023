@@ -1,8 +1,6 @@
-import { inputToLines } from './util.js'
-
-const DigitMatch : RegExp = new RegExp("(one)|(two)|(three)|(four)|(five)|(six)|(seven)|(eight)|(nine)");
-
-function convertDigitStringToNumber(input : string) {
+import { inputToLines } from '../util.js';
+const DigitMatch = new RegExp("(one)|(two)|(three)|(four)|(five)|(six)|(seven)|(eight)|(nine)");
+function convertDigitStringToNumber(input) {
     switch (input) {
         case "one":
             return 1;
@@ -35,10 +33,9 @@ function convertDigitStringToNumber(input : string) {
             return NaN;
     }
 }
-
-function findFirstDigit(line : string) {
-    for(let i = 0; i <= line.length; i++) {
-        const substring = line.substring(0,i);
+function findFirstDigit(line) {
+    for (let i = 0; i <= line.length; i++) {
+        const substring = line.substring(0, i);
         const digitResult = substring.match(/\d/);
         if (digitResult !== null)
             return Number.parseInt(digitResult[0]);
@@ -48,10 +45,9 @@ function findFirstDigit(line : string) {
     }
     return 0;
 }
-
-function findLastDigit(line : string) {
-    for(let i = line.length-1; i >=0; i--) {
-        const substring = line.substring(i,line.length);
+function findLastDigit(line) {
+    for (let i = line.length - 1; i >= 0; i--) {
+        const substring = line.substring(i, line.length);
         const digitResult = substring.match(/\d/);
         if (digitResult !== null)
             return Number.parseInt(digitResult[0]);
@@ -61,16 +57,13 @@ function findLastDigit(line : string) {
     }
     return 0;
 }
-
 let sum = 0;
 const lines = await inputToLines(1);
-
 for (const line of lines) {
     const firstDigit = findFirstDigit(line);
     const lastDigit = findLastDigit(line);
     //console.log(firstDigit*10 + lastDigit);
-    sum += (firstDigit*10) + lastDigit;
+    sum += (firstDigit * 10) + lastDigit;
 }
-
 console.log(sum);
 process.exit(0);

@@ -1,4 +1,4 @@
-import { inputToLines } from "./util.js";
+import { inputToLines } from "../util.js";
 
 const DAYNUMBER = 5;
 const lines = await inputToLines(DAYNUMBER);

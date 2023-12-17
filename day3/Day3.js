@@ -1,4 +1,4 @@
-import { inputToLines } from "./util.js";
+import { inputToLines } from "../util.js";
 const DAYNUMBER = 3;
 const SLIDINGWINDOW = 3;
 const lines = await inputToLines(DAYNUMBER);
