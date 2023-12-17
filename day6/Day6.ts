@@ -33,6 +33,28 @@ function parseInput(inputLines : string[]) : RaceInfo[] {
 
 }
 
+function parseInputPart2(inputLines : string[]) : RaceInfo[] {
+
+    const TIMEEXP = /Time:(?:\s*((?:\s*\d+\s*)+)\s*)+/;
+    const DISTANCEEXP = /Distance:(?:\s*((?:\s*\d+\s*)+)\s*)+/
+
+    const timeMatch = inputLines[0].match(TIMEEXP);
+    const distanceMatch = inputLines[1].match(DISTANCEEXP);
+
+    if (timeMatch === null || distanceMatch === null) process.exit(1);
+
+    const time = timeMatch[1].replaceAll(/\s+/g,'');
+    const distance = distanceMatch[1].replaceAll(/\s+/g,'');
+
+    const races : RaceInfo[] = [{
+        time : Number.parseInt(time),
+        recordDistance : Number.parseInt(distance)
+    }];
+
+    return races;
+
+}
+
 function calculateDistance(totalTime : number, buttonTime : number) {
 
     const speed = buttonTime;
@@ -76,5 +98,25 @@ function part1Main(inputLines : string[]) {
 
 }
 
-console.log(part1Main(lines));
+function part2Main(inputLines : string[]) {
+
+    const races = parseInputPart2(inputLines);
+
+    const limits = [];
+    for (const race of races) { limits.push(findTimeLimits(race)); }
+
+    const ranges = [];
+    for (const limit of limits) { 
+        ranges.push(limit[1]-limit[0]+1);
+    }
+
+    return ranges.reduce( 
+        (mult, curr) => mult * curr,
+        1
+    );
+
+
+}
+
+console.log(part2Main(lines));
 
