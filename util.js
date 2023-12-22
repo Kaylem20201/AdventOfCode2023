@@ -34,3 +34,9 @@ export function binaryInsertionSearch(a, item, low, high, sortingFunction) {
         return binaryInsertionSearch(a, item, mid + 1, high, sortingFunction);
     return binaryInsertionSearch(a, item, low, mid - 1, sortingFunction);
 }
+export function lcm(a, b) {
+    return (a * b) / gcd(a, b);
+}
+export function gcd(a, b) {
+    return (b === 0) ? a : gcd(b, a % b);
+}

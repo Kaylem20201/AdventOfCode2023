@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
 
-export async function inputToLines(dayNumber : Number) {
+export async function inputToLines(dayNumber: Number) {
     const fileStream = fs.createReadStream('day' + dayNumber.toString() + '/input.txt');
 
     const rl = readline.createInterface({
@@ -9,7 +9,7 @@ export async function inputToLines(dayNumber : Number) {
         crlfDelay: Infinity,
     });
 
-    const lines : string[] = [];
+    const lines: string[] = [];
 
     for await (const line of rl) {
         lines.push(line);
@@ -29,19 +29,25 @@ export async function inputToLines(dayNumber : Number) {
  * @param sortingFunction Function used for determining sorting order
  * @returns Index
  */
+export function binaryInsertionSearch<Type>(a: Type[], item: any, low: number, high: number, sortingFunction: Function) {
 
-export function binaryInsertionSearch<Type>(a : Type[], item : any, low : number, high : number, sortingFunction : Function)
-{
-  
     if (high <= low) return (sortingFunction(item, a[low]) > 0) ? (low + 1) : low;
-  
+
     let mid = Math.floor((low + high) / 2);
 
     const midSortResult = sortingFunction(item, a[mid]);
-  
-    if(midSortResult === 0) return mid + 1;
-  
-    if(midSortResult > 0) return binaryInsertionSearch(a, item, mid + 1, high, sortingFunction);
-          
+
+    if (midSortResult === 0) return mid + 1;
+
+    if (midSortResult > 0) return binaryInsertionSearch(a, item, mid + 1, high, sortingFunction);
+
     return binaryInsertionSearch(a, item, low, mid - 1, sortingFunction);
+}
+
+export function lcm(a: number, b: number): number {
+    return  (a * b) / gcd(a, b);
+}
+
+export function gcd(a: number, b: number): number {
+    return (b === 0) ? a : gcd(b, a % b);
 }

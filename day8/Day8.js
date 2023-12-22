@@ -1,4 +1,5 @@
 import { inputToLines } from "../util.js";
+import { lcm } from "../util.js";
 const DAYNUMBER = 8;
 const lines = await inputToLines(DAYNUMBER);
 class Directions {
@@ -7,6 +8,9 @@ class Directions {
     constructor(characters) {
         this.directions = characters;
         this.index = -1;
+    }
+    curr() {
+        return (this.directions[this.index]);
     }
     next() {
         this.index++;
@@ -18,6 +22,8 @@ class Directions {
 function parseInput(inputLines) {
     const directions = inputLines[0].split('');
     const nodes = new Map;
+    const startingNodeIndices = [];
+    const endingNodeIndices = [];
     for (let i = 2; i < inputLines.length; i++) {
         const line = inputLines[i];
         const newNode = {
@@ -26,8 +32,33 @@ function parseInput(inputLines) {
             nextRight: line.substring(12, 15)
         };
         nodes.set(newNode.index, newNode);
+        if (newNode.index.match(/..A/))
+            startingNodeIndices.push(newNode.index);
+        else if (newNode.index.match(/..Z/))
+            endingNodeIndices.push(newNode.index);
     }
-    return { directions, nodes };
+    return { directions, nodes, startingNodeIndices, endingNodeIndices };
+}
+function findNextIndex(currentNode, direction) {
+    if (direction === 'L')
+        return currentNode.nextLeft;
+    if (direction === 'R')
+        return currentNode.nextRight;
+    throw new Error('Invalid Direction');
+}
+function findPeriodOfGhost(startingNodeIndex, directions, nodes) {
+    let period = 0;
+    let currNode = nodes.get(startingNodeIndex);
+    if (currNode === undefined)
+        throw new Error('Node not found');
+    while (!currNode.index.match(/..Z/)) {
+        const nextIndex = findNextIndex(currNode, directions.next());
+        currNode = nodes.get(nextIndex);
+        if (currNode === undefined)
+            throw new Error('Node not found');
+        period++;
+    }
+    return period;
 }
 function part1Main(inputLines) {
     const input = parseInput(inputLines);
@@ -54,4 +85,19 @@ function part1Main(inputLines) {
     }
     console.log(steps);
 }
-part1Main(lines);
+function part2Main(inputLines) {
+    const input = parseInput(inputLines);
+    const nodes = input.nodes;
+    const startingNodeIndices = input.startingNodeIndices;
+    if (startingNodeIndices === undefined)
+        throw new Error("No Starting Index");
+    const periods = [];
+    for (const index of startingNodeIndices) {
+        const directions = new Directions(input.directions);
+        periods.push(findPeriodOfGhost(index, directions, nodes));
+    }
+    const shortest = periods.reduce((min, curr) => lcm(min, curr));
+    console.log(shortest);
+}
+//part1Main(lines);
+part2Main(lines);
