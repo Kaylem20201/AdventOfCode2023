@@ -4,8 +4,9 @@ const lines = await inputToLines(DAYNUMBER);
 function parseInput(inputLines) {
     const histories = [];
     for (const line of inputLines) {
-        histories.push(line.split(' ').map((value) => parseInt(value)));
+        histories.push(line.split(/\s+/).map((value) => parseInt(value)));
     }
+    console.log(histories);
     return { histories };
 }
 function extrapolateNextValue(history) {
@@ -28,6 +29,17 @@ function getDifferences(values) {
     }
     return differences;
 }
+function extrapolatePreviousValue(history) {
+    let differences = getDifferences(history);
+    if (differences === undefined)
+        throw new Error();
+    //base case
+    if (differences?.every((value) => value === 0)) {
+        return history[0];
+    }
+    //recursive case
+    return (history[0] - extrapolatePreviousValue(differences));
+}
 function part1Main(inputLines) {
     const input = parseInput(inputLines);
     const extrapolatedValues = [];
@@ -37,4 +49,13 @@ function part1Main(inputLines) {
     const result = extrapolatedValues.reduce((acc, curr) => acc + curr);
     console.log(result);
 }
-part1Main(lines);
+function part2Main(inputLines) {
+    const input = parseInput(inputLines);
+    const extrapolatedValues = [];
+    for (const history of input.histories) {
+        extrapolatedValues.push(extrapolatePreviousValue(history));
+    }
+    const result = extrapolatedValues.reduce((acc, curr) => acc + curr);
+    console.log(result);
+}
+part2Main(lines);

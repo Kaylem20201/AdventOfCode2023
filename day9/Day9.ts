@@ -11,8 +11,9 @@ function parseInput(inputLines : string[]) : ParsedInput {
     const histories : number[][] = [];
 
     for (const line of inputLines) {
-        histories.push(line.split(' ').map( (value) => parseInt(value)));
+        histories.push(line.split(/\s+/).map( (value) => parseInt(value)));
     }
+    console.log(histories);
 
     return { histories };
 }
@@ -44,6 +45,19 @@ function getDifferences(values : number[]) : number[] | undefined {
 
 }
 
+function extrapolatePreviousValue(history : number[]) : number {
+
+    let differences = getDifferences(history);
+    if (differences === undefined) throw new Error();
+
+    //base case
+    if (differences?.every( (value) => value===0)) { return history[0] }
+
+    //recursive case
+    return (history[0] - extrapolatePreviousValue(differences));
+
+}
+
 function part1Main(inputLines : string[]) {
 
     const input : ParsedInput = parseInput(inputLines);
@@ -59,4 +73,19 @@ function part1Main(inputLines : string[]) {
 
 }
 
-part1Main(lines);
+function part2Main(inputLines : string[]) {
+
+    const input : ParsedInput = parseInput(inputLines);
+    
+    const extrapolatedValues = [];
+    for (const history of input.histories) {
+        extrapolatedValues.push(extrapolatePreviousValue(history));
+    }
+
+    const result = extrapolatedValues.reduce( (acc, curr) => acc + curr);
+
+    console.log(result);
+
+}
+
+part2Main(lines);
