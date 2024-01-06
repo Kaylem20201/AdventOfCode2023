@@ -5,7 +5,7 @@ function parseInput(inputLines) {
     const inputWidth = inputLines[0].length;
     let tileArray = new Array(inputWidth);
     for (let i = 0; i < inputWidth; i++) {
-        tileArray[i] = new Array(10);
+        tileArray[i] = new Array(inputLines.length);
     }
     let startingX = 0;
     let startingY = 0;
@@ -34,6 +34,7 @@ function createTile(character, coordinates) {
         return undefined;
     let tileType;
     let connections;
+    let isCornerPipe = undefined;
     switch (character) {
         case '.':
             tileType = 'ground';
@@ -43,11 +44,14 @@ function createTile(character, coordinates) {
             break;
         case '|':
         case '-':
+            tileType = 'pipe';
+            break;
         case 'L':
         case 'J':
         case '7':
         case 'F':
             tileType = 'pipe';
+            isCornerPipe = true;
             break;
         default: return undefined;
     }
@@ -55,7 +59,8 @@ function createTile(character, coordinates) {
     const resultTile = {
         type: tileType,
         coordinates: coordinates,
-        connectedCoordinates: connections
+        connectedCoordinates: connections,
+        isCornerPipe: isCornerPipe
     };
     return resultTile;
 }
@@ -100,6 +105,35 @@ function mapPipeLoop(startingTile, tileArray) {
     }
     throw new Error("Couldn't map path");
 }
+function getVertices(loopTiles, tileArray) {
+    const vertices = [];
+    for (const tile of loopTiles) {
+        if (tile.type === 'start') {
+            const startCoordinates = tile.coordinates;
+            const leftTile = getTile({ x: startCoordinates.x - 1, y: startCoordinates.y }, tileArray);
+            const downTile = getTile({ x: startCoordinates.x, y: startCoordinates.y + 1 }, tileArray);
+            const rightTile = getTile({ x: startCoordinates.x + 1, y: startCoordinates.y }, tileArray);
+            const upTile = getTile({ x: startCoordinates.x, y: startCoordinates.y - 1 }, tileArray);
+            if (leftTile !== undefined &&
+                loopTiles.includes(leftTile) &&
+                rightTile !== undefined &&
+                loopTiles.includes(rightTile)) {
+                continue;
+            }
+            if (upTile !== undefined &&
+                loopTiles.includes(upTile) &&
+                downTile !== undefined &&
+                loopTiles.includes(downTile)) {
+                continue;
+            }
+            vertices.push(tile);
+            continue;
+        }
+        if (tile.isCornerPipe === true)
+            vertices.push(tile);
+    }
+    return vertices;
+}
 function getTile(coordinates, tileArray) {
     const tilesWidth = tileArray.length;
     const tilesLength = tileArray[0].length;
@@ -132,6 +166,21 @@ function traverseLoop(previousTile, currentTile, tileArray, traversedTiles) {
         return undefined;
     const newTraversedTiles = traversedTiles.concat(nextTile);
     return newTraversedTiles;
+}
+function getAreaByShoelace(verticesArray) {
+    let sum = 0;
+    for (let i = 0; i < verticesArray.length - 1; i++) {
+        const ySum = verticesArray[i].y + verticesArray[i + 1].y;
+        const xDiff = verticesArray[i].x - verticesArray[i + 1].x;
+        const prod = ySum * xDiff;
+        sum += prod;
+    }
+    const ySum = verticesArray.at(-1).y + verticesArray.at(0).y;
+    const xDiff = verticesArray.at(-1).x - verticesArray.at(0).x;
+    const prod = ySum * xDiff;
+    sum += prod;
+    const res = Math.abs(sum / 2);
+    return res;
 }
 function findConnections(tileCharacter, coordinates) {
     if (tileCharacter.length !== 1)
@@ -185,10 +234,62 @@ function checkTileConnections(tileA, tileB) {
         return false;
     return true;
 }
+function isInside(startTile, tileArray, loopTiles) {
+    let intersections = 0;
+    function nextCoordinates() {
+        return {
+            x: currTile.coordinates.x + 1,
+            y: currTile.coordinates.y
+        };
+    }
+    function nextAfterCoordinates() {
+        return {
+            x: currTile.coordinates.x + 2,
+            y: currTile.coordinates.y
+        };
+    }
+    if (loopTiles.includes(startTile)) {
+        return false;
+    }
+    let currTile = startTile;
+    let nextTile = getTile(nextCoordinates(), tileArray);
+    let currOnLoop = false;
+    while (nextTile !== undefined) {
+        let nextOnLoop = loopTiles.includes(nextTile);
+        if (nextOnLoop === true && currOnLoop === false) {
+            let nextAfterTile = getTile(nextAfterCoordinates(), tileArray);
+            if (nextAfterTile !== undefined) {
+                let nextAfterOnLoop = loopTiles.includes(nextAfterTile);
+                if (nextAfterOnLoop === false)
+                    intersections += 1;
+            }
+        }
+        currTile = nextTile;
+        currOnLoop = nextOnLoop;
+        nextTile = getTile(nextCoordinates(), tileArray);
+    }
+    //console.log('Tile: ' + startTile.coordinates.x + ',' + startTile.coordinates.y);
+    //console.log('Intersections: ' + intersections);
+    //console.log('Inside: ' + !((intersections % 2) === 0));
+    return !((intersections % 2) === 0);
+}
 function part1Main(inputLines) {
     const input = parseInput(inputLines);
     const startingTile = input.startingTile;
     const tileArray = input.tileArray;
     console.log(findOppositePipeSteps(startingTile, tileArray));
 }
-part1Main(lines);
+function part2Main(inputLines) {
+    const input = parseInput(inputLines);
+    const tileArray = input.tileArray;
+    const pipeTiles = mapPipeLoop(input.startingTile, tileArray);
+    const vertices = getVertices(pipeTiles, tileArray);
+    const vertexCoordinates = vertices.map((vertex) => vertex.coordinates);
+    const area = getAreaByShoelace(vertexCoordinates);
+    const perimeterPoints = pipeTiles.length;
+    //Pick's formula: Area = InteriorPoints + (PerimeterPoints / 2) - 1
+    //InteriorPoints = Area - (PerimeterPoints / 2) + 1
+    const interiorPoints = area - (perimeterPoints / 2) + 1;
+    console.log(interiorPoints);
+}
+part2Main(lines);
