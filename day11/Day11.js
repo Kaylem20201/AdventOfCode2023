@@ -56,13 +56,14 @@ function isGalaxyInRow(row, galaxyCoordinates) {
         return coordinates.y === row;
     });
 }
-function getRealDistance(pointA, pointB, galaxyCoordinates) {
+function getRealDistance(pointA, pointB, galaxyCoordinates, challengePart = 1) {
+    const distanceToAdd = ((challengePart === 2) ? 999999 : 1);
     const unadjustedXDiff = Math.abs(pointB.x - pointA.x);
     debug.print(unadjustedXDiff);
     const unadjustedYDiff = Math.abs(pointB.y - pointA.y);
     debug.print(unadjustedYDiff);
-    const adjustedXDiff = unadjustedXDiff + numEmptyColumnsInRange(pointA.x, pointB.x, galaxyCoordinates);
-    const adjustedYDiff = unadjustedYDiff + numEmptyRowsInRange(pointA.y, pointB.y, galaxyCoordinates);
+    const adjustedXDiff = unadjustedXDiff + (distanceToAdd * numEmptyColumnsInRange(pointA.x, pointB.x, galaxyCoordinates));
+    const adjustedYDiff = unadjustedYDiff + (distanceToAdd * numEmptyRowsInRange(pointA.y, pointB.y, galaxyCoordinates));
     const distance = adjustedXDiff + adjustedYDiff;
     return distance;
 }
@@ -80,6 +81,17 @@ function part1Main(inputLines) {
     return sum;
 }
 function part2Main(inputLines) {
+    const input = parseInput(inputLines);
+    const galaxyCoordinates = input.galaxyCoordinates;
+    let sum = 0;
+    for (let indexA = 0; indexA < galaxyCoordinates.length - 1; indexA++) {
+        for (let indexB = indexA + 1; indexB < galaxyCoordinates.length; indexB++) {
+            const distance = getRealDistance(galaxyCoordinates[indexA], galaxyCoordinates[indexB], galaxyCoordinates, 2);
+            debug.print("Distance between :", galaxyCoordinates[indexA], galaxyCoordinates[indexB], distance);
+            sum += distance;
+        }
+    }
+    return sum;
 }
 // debug.activate();
 console.log('Part 1 Result:' + part1Main(lines));

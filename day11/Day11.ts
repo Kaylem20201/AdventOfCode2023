@@ -31,7 +31,7 @@ function parseInput(inputLines : string[]) : ParsedInput {
  *
  **/
 function numEmptyRowsInRange(startRow : number, endRow : number, galaxyCoordinates : Coordinates[]) : number {
-    
+
     const low = Math.min(startRow, endRow);
     const high = Math.max(startRow, endRow);
 
@@ -40,7 +40,7 @@ function numEmptyRowsInRange(startRow : number, endRow : number, galaxyCoordinat
         if (!isGalaxyInRow(i, galaxyCoordinates)) sum += 1;
     }
     return sum;
-    
+
 }
 
 /**
@@ -53,17 +53,17 @@ function numEmptyColumnsInRange(startColumn : number, endColumn : number, galaxy
 
     const low = Math.min(startColumn, endColumn);
     const high = Math.max(startColumn, endColumn);
-    
+
     let sum = 0
     for (let i = low+1; i < high; i++) {
         if (!isGalaxyInColumn(i, galaxyCoordinates)) sum += 1;
     }
     return sum;
-    
+
 }
 
 function isGalaxyInColumn(column : number, galaxyCoordinates : Coordinates[]) : boolean {
-    
+
     return galaxyCoordinates.some( (coordinates) => {
         return coordinates.x === column;
     });
@@ -71,29 +71,31 @@ function isGalaxyInColumn(column : number, galaxyCoordinates : Coordinates[]) : 
 }
 
 function isGalaxyInRow(row : number, galaxyCoordinates : Coordinates[]) : boolean {
-    
+
     return galaxyCoordinates.some( (coordinates) => {
         return coordinates.y === row;
     });
 
 }
 
-function getRealDistance(pointA : Coordinates, pointB : Coordinates, galaxyCoordinates : Coordinates[]) : number {
-    
+function getRealDistance(pointA : Coordinates, pointB : Coordinates, galaxyCoordinates : Coordinates[], challengePart = 1) : number {
+
+    const distanceToAdd = ((challengePart === 2) ? 999999 : 1 );
+
     const unadjustedXDiff = Math.abs(pointB.x - pointA.x);
     debug.print(unadjustedXDiff);
     const unadjustedYDiff = Math.abs(pointB.y - pointA.y);
     debug.print(unadjustedYDiff);
-    const adjustedXDiff = unadjustedXDiff + numEmptyColumnsInRange(pointA.x, pointB.x, galaxyCoordinates);
-    const adjustedYDiff = unadjustedYDiff + numEmptyRowsInRange(pointA.y, pointB.y, galaxyCoordinates);
+    const adjustedXDiff = unadjustedXDiff + (distanceToAdd * numEmptyColumnsInRange(pointA.x, pointB.x, galaxyCoordinates));
+    const adjustedYDiff = unadjustedYDiff + (distanceToAdd * numEmptyRowsInRange(pointA.y, pointB.y, galaxyCoordinates));
     const distance = adjustedXDiff + adjustedYDiff;
     return distance;
-    
+
 }
 
 
 function part1Main(inputLines : string[]) : number {
-    
+
     const input = parseInput(inputLines);
     const galaxyCoordinates = input.galaxyCoordinates;
     let sum = 0;
@@ -113,6 +115,21 @@ function part1Main(inputLines : string[]) : number {
 
 
 function part2Main(inputLines : string[]) {
+
+    const input = parseInput(inputLines);
+    const galaxyCoordinates = input.galaxyCoordinates;
+    let sum = 0;
+    for (let indexA = 0; indexA < galaxyCoordinates.length - 1; indexA++) {
+        for (let indexB = indexA+1; indexB < galaxyCoordinates.length; indexB++) {
+            const distance = getRealDistance(galaxyCoordinates[indexA], galaxyCoordinates[indexB], galaxyCoordinates, 2);
+            debug.print("Distance between :",
+                galaxyCoordinates[indexA],
+                galaxyCoordinates[indexB],
+                distance);
+            sum += distance;
+        }
+    }
+    return sum;
 
 }
 
