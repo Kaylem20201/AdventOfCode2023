@@ -19,6 +19,58 @@ export async function inputToLines(dayNumber: Number) {
 }
 
 /**
+ * Debugging tool
+ */
+export class Debug {
+	active : boolean = false;
+	logging : boolean = false;
+
+	constructor() {
+	}
+
+	/**
+	 * Activate debug mode.
+	 * @remarks
+	 * 
+	 */
+	activate(...opts : string[]) : void {
+        this.active = true;
+        console.log("Debugging mode active.");
+		if(opts.includes('logs')) { this.logging = true; }
+	}
+
+	/**
+	 * Deactivates debug mode
+	 */
+	deactivate() : void {
+		this.active = false;
+		console.log("Debugging deactivated");
+		// if(this.logging) { this.log(); }
+	}
+
+	/**
+	 * Prints only if debugging is active
+	 * @param args Arguments to print
+	 */
+	print(...args : any[]) : void {
+		if (this.active) { console.log(...args) };
+	}
+
+	/*
+         * log() : string {
+	 * }
+         */
+
+	/* error(errorArg : Error) {
+		if (this.logging) { 
+			const filename = this.log();
+			errorArg.message = errorArg.message + '\nLogs at:' + filename;
+		}
+		throw errorArg;
+	} */
+}
+
+/**
  *  Binary search on an array.
  *  Returns the appropriate index for insertion on a sorted array.
  *

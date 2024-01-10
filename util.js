@@ -13,6 +13,45 @@ export async function inputToLines(dayNumber) {
     return lines;
 }
 /**
+ * Debugging tool
+ */
+export class Debug {
+    active = false;
+    logging = false;
+    constructor() {
+    }
+    /**
+     * Activate debug mode.
+     * @remarks
+     *
+     */
+    activate(...opts) {
+        this.active = true;
+        console.log("Debugging mode active.");
+        if (opts.includes('logs')) {
+            this.logging = true;
+        }
+    }
+    /**
+     * Deactivates debug mode
+     */
+    deactivate() {
+        this.active = false;
+        console.log("Debugging deactivated");
+        // if(this.logging) { this.log(); }
+    }
+    /**
+     * Prints only if debugging is active
+     * @param args Arguments to print
+     */
+    print(...args) {
+        if (this.active) {
+            console.log(...args);
+        }
+        ;
+    }
+}
+/**
  *  Binary search on an array.
  *  Returns the appropriate index for insertion on a sorted array.
  *
