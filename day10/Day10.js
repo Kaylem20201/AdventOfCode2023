@@ -175,7 +175,10 @@ function getAreaByShoelace(verticesArray) {
         const prod = ySum * xDiff;
         sum += prod;
     }
+    //
+    //@ts-expect-error : .at is never undefined
     const ySum = verticesArray.at(-1).y + verticesArray.at(0).y;
+    //@ts-expect-error : .at is never undefined
     const xDiff = verticesArray.at(-1).x - verticesArray.at(0).x;
     const prod = ySum * xDiff;
     sum += prod;
