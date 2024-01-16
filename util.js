@@ -24,26 +24,28 @@ export class Debug {
      * Activate debug mode.
      * @remarks
      *
-     */
+    */
     activate(...opts) {
+        if (!this.active)
+            console.log("Debugging mode activated.");
         this.active = true;
-        console.log("Debugging mode active.");
         if (opts.includes('logs')) {
             this.logging = true;
         }
     }
     /**
      * Deactivates debug mode
-     */
+    */
     deactivate() {
+        if (this.active)
+            console.log("Debugging deactivated");
         this.active = false;
-        console.log("Debugging deactivated");
         // if(this.logging) { this.log(); }
     }
     /**
      * Prints only if debugging is active
      * @param args Arguments to print
-     */
+    */
     print(...args) {
         if (this.active) {
             console.log(...args);

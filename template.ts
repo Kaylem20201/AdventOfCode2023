@@ -1,4 +1,5 @@
 import { inputToLines } from '../util.js'
+import { Debug } from './util.js';
 
 const DAYNUMBER = ;
 const lines = await inputToLines(DAYNUMBER);
@@ -13,12 +14,14 @@ function parseInput(inputLines : string[]) {
 
 function part1Main(inputLines : string[]) {
     
-    const input = inputLines
+    const input = parseInput(inputLines);
 
 }
 
 
 function part2Main(inputLines : string[]) {
+
+    const input = parseInput(inputLines);
 
 }
 

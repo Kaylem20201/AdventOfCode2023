@@ -5,14 +5,14 @@ export async function inputToLines(dayNumber: Number) {
     const fileStream = fs.createReadStream('day' + dayNumber.toString() + '/input.txt');
 
     const rl = readline.createInterface({
-        input: fileStream,
-        crlfDelay: Infinity,
+	input: fileStream,
+	crlfDelay: Infinity,
     });
 
     const lines: string[] = [];
 
     for await (const line of rl) {
-        lines.push(line);
+	lines.push(line);
     }
 
     return lines;
@@ -22,52 +22,52 @@ export async function inputToLines(dayNumber: Number) {
  * Debugging tool
  */
 export class Debug {
-	active : boolean = false;
-	logging : boolean = false;
+    active : boolean = false;
+    logging : boolean = false;
 
-	constructor() {
-	}
+    constructor() {
+    }
 
-	/**
+    /**
 	 * Activate debug mode.
 	 * @remarks
 	 * 
-	 */
-	activate(...opts : string[]) : void {
-        this.active = true;
-        console.log("Debugging mode active.");
-		if(opts.includes('logs')) { this.logging = true; }
-	}
+    */
+    activate(...opts : string[]) : void {
+	if (!this.active) console.log("Debugging mode activated.");
+	this.active = true;
+	if(opts.includes('logs')) { this.logging = true; }
+    }
 
-	/**
+    /**
 	 * Deactivates debug mode
-	 */
-	deactivate() : void {
-		this.active = false;
-		console.log("Debugging deactivated");
-		// if(this.logging) { this.log(); }
-	}
+    */
+    deactivate() : void {
+	if (this.active) console.log("Debugging deactivated");
+	this.active = false;
+	// if(this.logging) { this.log(); }
+    }
 
-	/**
+    /**
 	 * Prints only if debugging is active
 	 * @param args Arguments to print
-	 */
-	print(...args : any[]) : void {
-		if (this.active) { console.log(...args) };
-	}
+    */
+    print(...args : any[]) : void {
+	if (this.active) { console.log(...args) };
+    }
 
-	/*
-         * log() : string {
+    /*
+	 * log() : string {
 	 * }
-         */
+	 */
 
-	/* error(errorArg : Error) {
+    /* error(errorArg : Error) {
 		if (this.logging) { 
 			const filename = this.log();
 			errorArg.message = errorArg.message + '\nLogs at:' + filename;
 		}
 		throw errorArg;
-	} */
+    } */
 }
 
 /**
