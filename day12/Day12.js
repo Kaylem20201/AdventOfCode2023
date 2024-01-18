@@ -39,76 +39,55 @@ function numPossibilitiesForPuzzle(puzzle) {
     //Shallow copies
     const tiles = [...puzzle.tiles];
     const hints = [...puzzle.hints];
-    const wipPossibilites = [{ tiles, hints }];
-    const confirmedPossibilites = [];
-    while (wipPossibilites.length > 0) {
-        const curr = wipPossibilites.shift();
-        if (curr === undefined)
-            throw new Error();
-        const firstHintUsed = consumeFirstHint(curr);
-        if (firstHintUsed === undefined)
-            continue;
-        const newWips = firstHintUsed.filter((puzzle) => {
-            return puzzle.hints.length > 0;
-        });
-        const newCompletes = firstHintUsed.filter((puzzle) => {
-            if (puzzle.tiles.includes(TileTypes.bad))
-                return false;
-            return puzzle.hints.length === 0;
-        });
-        wipPossibilites.push(...newWips);
-        confirmedPossibilites.push(...newCompletes);
+    //Base case
+    if (tiles.length === 0) {
+        if (hints.length > 0)
+            return 0;
+        return 1;
     }
-    return confirmedPossibilites.length;
-}
-function consumeFirstHint(puzzle) {
-    const tiles = [...puzzle.tiles];
-    const hints = [...puzzle.hints];
-    const hint = hints[0];
-    if (hint === undefined)
-        return undefined;
-    let possibilitiesFromFirstHint = [];
-    for (let i = 0; i < tiles.length; i++) {
-        const tile = tiles[i];
-        if (tile === TileTypes.good)
-            continue;
-        if (tile === TileTypes.bad) {
-            //Check if hint works starting from this tile 
-            const res = hintCheck(tiles.slice(i), hint);
-            if (res)
-                possibilitiesFromFirstHint.push({
-                    tiles: tiles.slice(i + hint + 1),
-                    hints: hints.slice(1)
-                });
-            return possibilitiesFromFirstHint;
-        }
-        if (tile === TileTypes.unknown) {
-            //Check if hint works starting from this tile 
-            const res = hintCheck(tiles.slice(i), hint);
-            if (res)
-                possibilitiesFromFirstHint.push({
-                    tiles: tiles.slice(i + hint + 1),
-                    hints: hints.slice(1)
-                });
-            continue;
-        }
-        //Tile type unrecognized
-        console.log(tile);
-        throw new Error();
+    if (hints.length === 0) {
+        if (tiles.includes(TileTypes.bad))
+            return 0;
+        return 1;
     }
-    return possibilitiesFromFirstHint;
-    function hintCheck(subTiles, hint) {
-        for (let i = 0; i < hint; i++) {
-            const tile = subTiles[i];
-            if (tile === undefined)
-                return false;
-            if (tile === TileTypes.good)
-                return false;
+    //Recursive cases
+    const nextTile = tiles[0];
+    if (nextTile === TileTypes.bad) {
+        const tilesToCheck = tiles.slice(0, hints[0]);
+        const isInvalidRun = (tilesToCheck.includes(TileTypes.good) ||
+            tiles.length < hints[0] ||
+            tiles[hints[0]] === TileTypes.bad);
+        if (!isInvalidRun) {
+            const newPuzzle = {
+                tiles: tiles.slice(hints[0] + 1),
+                hints: hints.slice(1)
+            };
+            return numPossibilitiesForPuzzle(newPuzzle);
         }
-        if (subTiles[hint] === TileTypes.bad)
-            return false;
-        return true;
+        return 0;
     }
+    if (nextTile === TileTypes.good) {
+        const newPuzzle = {
+            tiles: tiles.slice(1),
+            hints: hints
+        };
+        return numPossibilitiesForPuzzle(newPuzzle);
+    }
+    if (nextTile === TileTypes.unknown) {
+        const newGoodTiles = [parseTile('.'), ...(tiles.slice(1).map(parseTile))];
+        const newBadTiles = [parseTile('#'), ...tiles.slice(1).map(parseTile)];
+        const newGoodPuzzle = {
+            tiles: newGoodTiles,
+            hints: hints
+        };
+        const newBadPuzzle = {
+            tiles: newBadTiles,
+            hints: hints
+        };
+        return (numPossibilitiesForPuzzle(newGoodPuzzle) +
+            numPossibilitiesForPuzzle(newBadPuzzle));
+    }
+    throw new Error();
 }
 function part1Main(inputLines) {
     const input = parseInput(inputLines);
