@@ -1,4 +1,5 @@
 import { inputToLines } from '../util.js';
+import { memoize } from '../util.js';
 const DAYNUMBER = 12;
 const lines = await inputToLines(DAYNUMBER);
 var TileTypes;
@@ -35,7 +36,7 @@ function parseTile(character) {
         default: throw new Error();
     }
 }
-function numPossibilitiesForPuzzle(puzzle) {
+const numPossibilitiesForPuzzle = memoize((puzzle) => {
     //Shallow copies
     const tiles = [...puzzle.tiles];
     const hints = [...puzzle.hints];
@@ -88,7 +89,7 @@ function numPossibilitiesForPuzzle(puzzle) {
             numPossibilitiesForPuzzle(newBadPuzzle));
     }
     throw new Error();
-}
+});
 function part1Main(inputLines) {
     const input = parseInput(inputLines);
     const puzzles = input.puzzles;
@@ -102,7 +103,17 @@ function part1Main(inputLines) {
     return sum;
 }
 function part2Main(inputLines) {
-    const input = parseInput(inputLines);
+    const unfoldedLines = inputLines.map(unfoldLine);
+    const input = parseInput(unfoldedLines);
+    const puzzles = input.puzzles;
+    let sum = 0;
+    let lineNo = 1;
+    for (const puzzle of puzzles) {
+        const newPoss = numPossibilitiesForPuzzle(puzzle);
+        console.log('Line ' + lineNo++ + ': ' + newPoss);
+        sum += newPoss;
+    }
+    return sum;
 }
 console.log('Part 1 Result:' + part1Main(lines));
 console.log('Part 2 Result:' + part2Main(lines));

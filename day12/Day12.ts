@@ -59,7 +59,7 @@ function parseTile(character : string) : TileTypes {
     }
 }
 
-function numPossibilitiesForPuzzle(puzzle : Puzzle) : number {
+const numPossibilitiesForPuzzle = memoize((puzzle : Puzzle) : number => {
     
     //Shallow copies
     const tiles : TileTypes[] = [...puzzle.tiles];
@@ -119,7 +119,7 @@ function numPossibilitiesForPuzzle(puzzle : Puzzle) : number {
 
     throw new Error();
 
-}
+});
 
 
 
@@ -141,7 +141,17 @@ function part1Main(inputLines : string[]) {
 
 function part2Main(inputLines : string[]) {
 
-    const input = parseInput(inputLines);
+    const unfoldedLines = inputLines.map(unfoldLine);
+    const input = parseInput(unfoldedLines);
+    const puzzles = input.puzzles;
+    let sum = 0;
+    let lineNo = 1;
+    for (const puzzle of puzzles) {
+	const newPoss = numPossibilitiesForPuzzle(puzzle);
+	console.log('Line ' + lineNo++ + ': ' + newPoss);
+	sum +=newPoss;
+    }
+    return sum;
 
 }
 
