@@ -1,6 +1,25 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
 
+export function memoize<Args extends unknown[], ResultType> (
+    fn : (...args : Args) => ResultType
+) : (...args : Args) => ResultType {
+
+    const memoMap = new Map<string, ResultType>();
+
+    const returnFunction = (...args : Args) => {
+	const argsString = JSON.stringify(args);
+	if (memoMap.has(argsString)) return memoMap.get(argsString)!;
+	//Arguments not seen before
+	const newResult = fn(...args);
+	memoMap.set(argsString, newResult);
+	return newResult;
+    }
+
+    return returnFunction;
+
+}
+
 export async function inputToLines(dayNumber: Number) {
     const fileStream = fs.createReadStream('day' + dayNumber.toString() + '/input.txt');
 

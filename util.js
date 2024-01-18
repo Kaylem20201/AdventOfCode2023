@@ -1,5 +1,18 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
+export function memoize(fn) {
+    const memoMap = new Map();
+    const returnFunction = (...args) => {
+        const argsString = JSON.stringify(args);
+        if (memoMap.has(argsString))
+            return memoMap.get(argsString);
+        //Arguments not seen before
+        const newResult = fn(...args);
+        memoMap.set(argsString, newResult);
+        return newResult;
+    };
+    return returnFunction;
+}
 export async function inputToLines(dayNumber) {
     const fileStream = fs.createReadStream('day' + dayNumber.toString() + '/input.txt');
     const rl = readline.createInterface({
