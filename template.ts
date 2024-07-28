@@ -1,5 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { inputToLines } from '../util.js'
-import { Debug } from './util.js';
 
 const DAYNUMBER = ;
 const lines = await inputToLines(DAYNUMBER);
